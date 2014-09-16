@@ -150,6 +150,11 @@ bool qSlicerVolumesReader::load(const IOProperties& properties)
     {
     propagateVolumeSelection = properties["show"].toBool();
     }
+  // 0: do not fit slices
+  // 1: fit slice to all
+  // 2: fit slice to loaded volume
+  int fit = properties.value("fitSlicesToVolumes", 1).toInt();
+
   vtkSmartPointer<vtkStringArray> fileList;
   if (properties.contains("fileNames"))
     {
@@ -194,6 +199,13 @@ bool qSlicerVolumesReader::load(const IOProperties& properties)
         if (appLogic)
           {
           appLogic->PropagateVolumeSelection(); // includes FitSliceToAll by default
+        if (fit == 1)
+          {
+          appLogic->PropagateVolumeSelection(); // includes FitSliceToAll by default
+          }
+        else if (fit == 2)
+          {
+          appLogic->FitSlicesToVolume(node->GetID());
           }
         }
       }
