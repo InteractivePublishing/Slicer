@@ -356,6 +356,12 @@ void vtkMRMLApplicationLogic::SetInteractionNode(vtkMRMLInteractionNode *interac
 }
 
 //----------------------------------------------------------------------------
+void vtkMRMLApplicationLogic::PropagateVolumeSelection(int layer, int fit)
+{
+  this->Internal->PropagateVolumeSelection(layer, fit);
+}
+
+//----------------------------------------------------------------------------
 void vtkMRMLApplicationLogic::PropagateVolumeSelection(int fit)
 {
   this->PropagateVolumeSelection(
@@ -378,12 +384,6 @@ void vtkMRMLApplicationLogic::PropagateForegroundVolumeSelection(int fit)
 void vtkMRMLApplicationLogic::PropagateLabelVolumeSelection(int fit)
 {
   this->PropagateVolumeSelection(LabelLayer, fit);
-}
-
-//----------------------------------------------------------------------------
-void vtkMRMLApplicationLogic::PropagateVolumeSelection(int layer, int fit)
-{
-  this->Internal->PropagateVolumeSelection(layer, fit);
 }
 
 //----------------------------------------------------------------------------
@@ -458,6 +458,43 @@ void vtkMRMLApplicationLogic::FitSliceToAll(bool onlyIfPropagateVolumeSelectionA
     int *dims = sliceNode->GetDimensions();
     sliceLogic->FitSliceToAll(dims[0], dims[1]);
     sliceLogic->SnapSliceOffsetToIJK();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkMRMLApplicationLogic::FitSlicesToVolume(const char* volumeNodeID)
+{
+  if (this->Internal->SliceLogics.GetPointer() == 0)
+    {
+    return;
+    }
+  std::string volume(volumeNodeID ? volumeNodeID : "");
+  vtkMRMLSliceLogic* sliceLogic = 0;
+  vtkCollectionSimpleIterator it;
+  for(this->Internal->SliceLogics->InitTraversal(it);
+      (sliceLogic = vtkMRMLSliceLogic::SafeDownCast(
+        this->Internal->SliceLogics->GetNextItemAsObject(it)));)
+    {
+    vtkMRMLSliceCompositeNode* sliceCompositeNode = sliceLogic->GetSliceCompositeNode();
+    if (!sliceCompositeNode)
+      {
+      continue;
+      }
+    std::string background(sliceCompositeNode->GetBackgroundVolumeID() ?
+      sliceCompositeNode->GetBackgroundVolumeID() : "");
+    std::string foreground(sliceCompositeNode->GetForegroundVolumeID() ?
+      sliceCompositeNode->GetBackgroundVolumeID() : "");
+    std::string labelmap(sliceCompositeNode->GetLabelVolumeID() ?
+      sliceCompositeNode->GetLabelVolumeID() : "");
+    if (volume.size() == 0 ||
+        volume == background || volume == foreground || volume == labelmap)
+      {
+      vtkMRMLSliceNode *sliceNode = sliceLogic->GetSliceNode();
+
+      int *dims = sliceNode->GetDimensions();
+      sliceLogic->FitSliceToAll(dims[0], dims[1]);
+      sliceLogic->SnapSliceOffsetToIJK();
+      }
     }
 }
 
