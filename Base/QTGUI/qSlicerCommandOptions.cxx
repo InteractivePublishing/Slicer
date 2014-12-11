@@ -72,6 +72,12 @@ bool qSlicerCommandOptions::exitAfterStartup()const
 }
 
 //-----------------------------------------------------------------------------
+QString qSlicerCommandOptions::ndLibrary() const
+{
+  return this->parsedArgs().value("ndLibrary").toString();
+}
+
+//-----------------------------------------------------------------------------
 void qSlicerCommandOptions::addArguments()
 {
   this->Superclass::addArguments();
@@ -100,4 +106,6 @@ void qSlicerCommandOptions::addArguments()
 
   this->addArgument("exit-after-startup", "", QVariant::Bool,
                     "Exit after startup is complete. Useful for measuring startup time");
+
+  this->addArgument("ndLibrary", "", QVariant::String, "Path to ndLibrary");
 }
