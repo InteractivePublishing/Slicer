@@ -217,9 +217,10 @@ public:
                                        vtkMRMLVolumeNode *volumeNode,
                                        vtkMRMLVolumePropertyNode **propNode,
                                        vtkMRMLAnnotationROINode **roiNode);
+
   /// Utility function that calls UpdateDisplayNodeFromVolumeNode()
-  inline void UpdateDisplayNodeFromVolumeNode(vtkMRMLVolumeRenderingDisplayNode *paramNode,
-                                              vtkMRMLVolumeNode *volumeNode);
+  void UpdateDisplayNodeFromVolumeNode(vtkMRMLVolumeRenderingDisplayNode *paramNode,
+                                       vtkMRMLVolumeNode *volumeNode);
 
   /// \deprecated
   /// Create and add into the scene a vtkMRMLVolumeRenderingScenarioNode
@@ -343,15 +344,5 @@ private:
   vtkSlicerVolumeRenderingLogic(const vtkSlicerVolumeRenderingLogic&); // Not implemented
   void operator=(const vtkSlicerVolumeRenderingLogic&);               // Not implemented
 };
-
-//----------------------------------------------------------------------------
-void vtkSlicerVolumeRenderingLogic
-::UpdateDisplayNodeFromVolumeNode(vtkMRMLVolumeRenderingDisplayNode *paramNode,
-                                  vtkMRMLVolumeNode *volumeNode)
-{
-  vtkMRMLVolumePropertyNode *propNode = NULL;
-  vtkMRMLAnnotationROINode *roiNode = NULL;
-  this->UpdateDisplayNodeFromVolumeNode(paramNode, volumeNode, &propNode, &roiNode);
-}
 
 #endif
