@@ -1024,7 +1024,7 @@ set(Slicer_CORE_LIBRARY qSlicerBaseQTCore)
 set(Slicer_GUI_LIBRARY qSlicerBaseQTApp)
 
 #-----------------------------------------------------------------------------
-# Applications
+# Core Modules
 #-----------------------------------------------------------------------------
 add_subdirectory(Modules/Core)
 add_subdirectory(Base/QTApp)
@@ -1034,6 +1034,8 @@ add_subdirectory(
   ${CMAKE_CURRENT_BINARY_DIR}/Applications
   )
 
+#-----------------------------------------------------------------------------
+# Slicer Config
 #-----------------------------------------------------------------------------
 set(Slicer_USE_FILE ${Slicer_BINARY_DIR}/UseSlicer.cmake)
 configure_file(
@@ -1047,7 +1049,6 @@ configure_file(
 set(Slicer_EXTENSION_GENERATE_CONFIG ${Slicer_SOURCE_DIR}/CMake/SlicerExtensionGenerateConfig.cmake)
 set(Slicer_EXTENSION_CPACK ${Slicer_SOURCE_DIR}/CMake/SlicerExtensionCPack.cmake)
 
-
 # --------------------------------------------------------------------------
 # Bundle remote modules and extensions adding source directories.
 # --------------------------------------------------------------------------
@@ -1059,6 +1060,39 @@ set(Slicer_DIR ${extensions_build_dir})
 configure_file(
   ${Slicer_SOURCE_DIR}/CMake/SlicerConfig.cmake.in
   ${Slicer_DIR}/SlicerConfig.cmake @ONLY)
+unset(Slicer_DIR)
+
+#-----------------------------------------------------------------------------
+# PRE-APP extension(s)
+#-----------------------------------------------------------------------------
+foreach(extension_source_dir ${Slicer_PRE_EXTENSION_SOURCE_DIRS})
+  get_filename_component(extension_source_dir ${extension_source_dir} REALPATH)
+  get_filename_component(extension_source_dirname ${extension_source_dir} NAME_WE)
+  message(STATUS "--------------------------------------------------")
+  message(STATUS "Configuring extension: ${extension_source_dirname}")
+  set(ExternalData_SOURCE_ROOT ${extension_source_dir})
+  set(${extension_source_dirname}_SOURCE_DIR ${extension_source_dir})
+  set(${extension_source_dirname}_BINARY_DIR ${extensions_build_dir}/${extension_source_dirname})
+  add_subdirectory(
+    ${${extension_source_dirname}_SOURCE_DIR}
+    ${${extension_source_dirname}_BINARY_DIR}
+    )
+endforeach()
+
+#-----------------------------------------------------------------------------
+# Application
+#-----------------------------------------------------------------------------
+if (NOT Slicer_APPLICATIONS_DIR)
+  add_subdirectory(Applications)
+else()
+  add_subdirectory(${Slicer_APPLICATIONS_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/Applications
+    )
+endif()
+
+# --------------------------------------------------------------------------
+# Bundle extension(s)
+# --------------------------------------------------------------------------
 
 #
 # Directories can be set in three ways:
