@@ -421,6 +421,9 @@ private:
   vtkMRMLSliceLogic(const vtkMRMLSliceLogic&);
   void operator=(const vtkMRMLSliceLogic&);
 
+  class vtkInternal;
+  vtkInternal* Internal;
+
 };
 
 #endif
