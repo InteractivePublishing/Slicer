@@ -196,8 +196,40 @@ struct BlendPipeline
 vtkStandardNewMacro(vtkMRMLSliceLogic);
 
 //----------------------------------------------------------------------------
+class vtkMRMLSliceLogic::vtkInternal
+{
+public:
+  vtkInternal(vtkMRMLSliceLogic * external);
+  ~vtkInternal();
+
+  vtkMRMLSliceLogic*        External;
+
+};
+
+//----------------------------------------------------------------------------
+// vtkInternal methods
+
+//----------------------------------------------------------------------------
+vtkMRMLSliceLogic::vtkInternal::vtkInternal(vtkMRMLSliceLogic * external)
+{
+  this->External = external;
+}
+
+//----------------------------------------------------------------------------
+vtkMRMLSliceLogic::vtkInternal::~vtkInternal()
+{
+}
+
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+// vtkMRMLSliceLogic methods
+
+//----------------------------------------------------------------------------
 vtkMRMLSliceLogic::vtkMRMLSliceLogic()
 {
+  this->Internal = new vtkInternal(this);
+
   this->Initialized = false;
   this->Name = 0;
   this->BackgroundLayer = 0;
@@ -253,6 +285,8 @@ vtkMRMLSliceLogic::~vtkMRMLSliceLogic()
     }
 
   this->DeleteSliceModel();
+
+  delete this->Internal;
 }
 
 //----------------------------------------------------------------------------
