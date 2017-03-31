@@ -835,7 +835,7 @@ void vtkMRMLDisplayNode::AddViewNodeID(const char* viewNodeID)
 }
 
 //-------------------------------------------------------
-void vtkMRMLDisplayNode::RemoveViewNodeID(char* viewNodeID)
+void vtkMRMLDisplayNode::RemoveViewNodeID(const char* viewNodeID)
 {
   if (viewNodeID == NULL)
     {
