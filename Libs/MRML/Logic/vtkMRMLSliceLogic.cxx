@@ -27,6 +27,7 @@
 #include <vtkMRMLScalarVolumeDisplayNode.h>
 #include <vtkMRMLScene.h>
 #include <vtkMRMLSliceCompositeNode.h>
+#include <vtkMRMLViewNode.h>
 
 // VTK includes
 #include <vtkAlgorithmOutput.h>
@@ -83,6 +84,9 @@ public:
   vtkInternal(vtkMRMLSliceLogic * external);
   ~vtkInternal();
 
+  void SetSliceDisplayNodeThreeDViewIDs(
+      vtkMRMLDisplayNode*sliceDisplayNode, const std::vector<std::string> & threeDViewIDs);
+
   vtkMRMLSliceLogic*        External;
 
 };
@@ -102,6 +106,32 @@ vtkMRMLSliceLogic::vtkInternal::~vtkInternal()
 }
 
 //----------------------------------------------------------------------------
+void vtkMRMLSliceLogic::vtkInternal::SetSliceDisplayNodeThreeDViewIDs(
+    vtkMRMLDisplayNode* sliceDisplayNode, const std::vector<std::string> & threeDViewIDs)
+{
+  assert(sliceDisplayNode);
+
+  int wasModifyingDisplayNode = sliceDisplayNode->StartModify();
+
+  // Clear all only 3D IDs
+  for (int index=0; index < sliceDisplayNode->GetNumberOfViewNodeIDs(); ++index)
+    {
+    if (vtkMRMLViewNode::SafeDownCast(
+          this->External->GetMRMLScene()->GetNodeByID(sliceDisplayNode->GetNthViewNodeID(index))))
+      {
+      sliceDisplayNode->RemoveViewNodeID(sliceDisplayNode->GetNthViewNodeID(index));
+      }
+    }
+
+  // Add 3D IDs
+  std::vector<std::string>::const_iterator it;
+  for (it = threeDViewIDs.begin(); it != threeDViewIDs.end(); ++it)
+    {
+    sliceDisplayNode->AddViewNodeID((*it).c_str());
+    }
+
+  sliceDisplayNode->EndModify(wasModifyingDisplayNode);
+}
 
 //----------------------------------------------------------------------------
 // vtkMRMLSliceLogic methods
@@ -505,7 +535,9 @@ void vtkMRMLSliceLogic::OnMRMLNodeModified(vtkMRMLNode* node)
     if ( sliceDisplayNode)
       {
       sliceDisplayNode->SetVisibility( this->SliceNode->GetSliceVisible() );
-      sliceDisplayNode->SetViewNodeIDs( this->SliceNode->GetThreeDViewIDs());
+
+      this->Internal->SetSliceDisplayNodeThreeDViewIDs(
+            sliceDisplayNode, this->SliceNode->GetThreeDViewIDs());
       }
     }
   else if (node == this->SliceCompositeNode)
@@ -1173,7 +1205,10 @@ void vtkMRMLSliceLogic::UpdatePipeline()
     if ( displayNode && this->SliceNode )
       {
       displayNode->SetVisibility( this->SliceNode->GetSliceVisible() );
-      displayNode->SetViewNodeIDs( this->SliceNode->GetThreeDViewIDs());
+
+      this->Internal->SetSliceDisplayNodeThreeDViewIDs(
+            displayNode, this->SliceNode->GetThreeDViewIDs());
+
       if ( (this->SliceNode->GetSliceResolutionMode() != vtkMRMLSliceNode::SliceResolutionMatch2DView &&
           !((backgroundImagePortUVW != 0) || (foregroundImagePortUVW != 0) || (labelImagePortUVW != 0) ) ) ||
           (this->SliceNode->GetSliceResolutionMode() == vtkMRMLSliceNode::SliceResolutionMatch2DView &&
