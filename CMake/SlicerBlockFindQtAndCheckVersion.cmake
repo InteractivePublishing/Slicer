@@ -26,7 +26,7 @@
 macro(__SlicerBlockFindQtAndCheckVersion_find_qt)
 #message( FATAL_ERROR "qt5d ${Qt5_DIR} ${Slicer_REQUIRED_QT_MODULES}")
   if(Slicer_REQUIRED_QT_VERSION VERSION_LESS "5")
-    message(FATAL_ERROR "qt version not 5! this is known to fail")
+    message(FATAL_ERROR "qt version req ${Slicer_REQUIRED_QT_VERSION} not 5! this is known to fail qm:${QT_QMAKE_EXECUTABLE}")
     find_package(Qt4)
     set(_found_var QT4_FOUND)
     set(_error_details "You probably need to set the QT_QMAKE_EXECUTABLE variable.")
