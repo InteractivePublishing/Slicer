@@ -198,14 +198,14 @@ bool qSlicerVolumesReader::load(const IOProperties& properties)
           }
         if (appLogic)
           {
-          appLogic->PropagateVolumeSelection(); // includes FitSliceToAll by default
-        if (fit == 1)
-          {
-          appLogic->PropagateVolumeSelection(); // includes FitSliceToAll by default
-          }
-        else if (fit == 2)
-          {
-          appLogic->FitSlicesToVolume(node->GetID());
+          if (fit == 1)
+            {
+            appLogic->PropagateVolumeSelection(); // includes FitSliceToAll by default
+            }
+          else if (fit == 2)
+            {
+            appLogic->FitSlicesToVolume(node->GetID());
+            }
           }
         }
       }
